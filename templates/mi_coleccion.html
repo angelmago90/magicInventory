@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Colección de Cartas Magic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #333; /* Dark grey background */
+            color: white;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        input[type=text] {
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 10px;
+            margin-right: 10px;
+            width: 300px; /* Adjusted width */
+            color: black; /* For readability */
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd; /* Light grey border */
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2; /* Lighter grey for header */
+            color: black;
+        }
+        tr:nth-child(even) {
+            background-color: #474747; /* Light grey background for even rows */
+        }
+        tr:hover {
+            background-color: #666; /* Darker grey on hover */
+        }
+                /* Estilos básicos para la barra de navegación */
+                nav {
+            background: #333;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin-right: 10px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 20px;
+            display: block;
+            border-radius: 5px;
+            background: #007bff;
+            transition: background-color 0.3s;
+        }
+        nav ul li a:hover, nav ul li a.active {
+            background: #0056b3;
+        }
+        .color-box {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%; /* Hace el círculo perfecto */
+            border: 2px solid #000; /* Borde negro para todos */
+            margin-right: 4px;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.5); /* Sombra suave */
+        }
+
+        .B { background-color: #4e4e4e; } /* Negro - ajustar al color deseado */
+        .G { background-color: #0a7b38; } /* Verde - ajustar al color deseado */
+        .R { background-color: #dc0a0a; } /* Rojo - ajustar al color deseado */
+        .U { background-color: #0a75dc; } /* Azul - ajustar al color deseado */
+        .W { background-color: #f9f9f6; } /* Blanco - ajustar al color deseado */
+        /* Clase adicional para el color incoloro */
+        .I {
+            background-color: #f0f0f0; /* Un gris claro para incoloro */
+            border: 2px dashed #ccc; /* Un borde punteado */
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/" class="{{ 'active' if request.path == '/' else '' }}">Buscar Carta</a></li>
+            <li><a href="/mi-coleccion" class="{{ 'active' if request.path == '/mi-coleccion' else '' }}">Mi Colección</a></li>
+        </ul>
+    </nav>
+
+    <h1>Mi Colección de Cartas Magic: The Gathering</h1>
+    <form action="/mi-coleccion" method="post">
+        <input type="text" name="nombre" placeholder="Buscar en mi colección" required>
+        <button type="submit">Buscar</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Set</th>
+                <th>Rareza</th>
+                <th>Colores</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for carta in cartas %}
+            <tr>
+                <td>{{ carta[1] }}</td> 
+                <td>{{ carta[3] }}</td>
+                <td>{{ carta[2] }}</td>
+                <td>
+                    {% if carta[4] %}
+                        {% for color_char in carta[4] %}
+                            <div class="color-box {{ color_char }}"></div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="color-box I" title="Incoloro"></div> <!-- Para cartas incoloras -->
+                    {% endif %}
+                </td>
+                <td>{{ carta[5] }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">No se encontraron cartas en la colección.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

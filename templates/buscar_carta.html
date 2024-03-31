@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscar Carta Magic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #333; /* Dark grey background */
+            color: white;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        input[type=text] {
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 10px;
+            margin-right: 10px;
+            width: 300px; /* Adjusted width */
+            color: black; /* For readability */
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd; /* Light grey border */
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2; /* Lighter grey for header */
+            color: black;
+        }
+        tr:nth-child(even) {
+            background-color: #474747; /* Light grey background for even rows */
+        }
+        tr:hover {
+            background-color: #666; /* Darker grey on hover */
+        }
+                /* Estilos básicos para la barra de navegación */
+                nav {
+            background: #333;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin-right: 10px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 20px;
+            display: block;
+            border-radius: 5px;
+            background: #007bff;
+            transition: background-color 0.3s;
+        }
+        nav ul li a:hover, nav ul li a.active {
+            background: #0056b3;
+        }
+        .color-box {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%; /* Hace el círculo perfecto */
+            border: 2px solid #000; /* Borde negro para todos */
+            margin-right: 4px;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.5); /* Sombra suave */
+        }
+
+        .B { background-color: #4e4e4e; } /* Negro - ajustar al color deseado */
+        .G { background-color: #0a7b38; } /* Verde - ajustar al color deseado */
+        .R { background-color: #dc0a0a; } /* Rojo - ajustar al color deseado */
+        .U { background-color: #0a75dc; } /* Azul - ajustar al color deseado */
+        .W { background-color: #f9f9f6; } /* Blanco - ajustar al color deseado */
+        /* Clase adicional para el color incoloro */
+        .I {
+            background-color: #f0f0f0; /* Un gris claro para incoloro */
+            border: 2px dashed #ccc; /* Un borde punteado */
+        }
+    </style>
+</head>
+<body>
+    <h1>Buscar Carta Magic: The Gathering</h1>
+    <nav>
+        <ul>
+            <li><a href="/" class="{{ 'active' if request.path == '/' else '' }}">Buscar Carta</a></li>
+            <li><a href="/mi-coleccion" class="{{ 'active' if request.path == '/mi-coleccion' else '' }}">Mi Colección</a></li>
+        </ul>
+    </nav>
+    <form action="/" method="post">
+        <input type="text" name="nombre" placeholder="Nombre de la carta" required>
+        <button type="submit">Buscar</button>
+    </form>
+
+    {% if cartas %}
+    <form action="/guardar" method="post">
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Nombre</th>
+                    <th>Set</th>
+                    <th>Rareza</th>
+                    <th>Colores</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for carta in cartas %}
+                <tr>
+                    <td><input type="checkbox" name="carta_id[]" value="{{ carta['id'] }}"></td>
+                    <td>{{ carta['name'] }}</td>
+                    <td>{{ carta['set_name'] }}</td>
+                    <td>{{ carta['rarity'] }}</td>
+                    <td>
+                        {% if carta['colors'] %}
+                            {% for color_char in carta['colors'] %}
+                                {% if color_char == 'B' %}
+                                    <div class="color-box B" title="Negro"></div>
+                                {% elif color_char == 'G' %}
+                                    <div class="color-box G" title="Verde"></div>
+                                {% elif color_char == 'R' %}
+                                    <div class="color-box R" title="Rojo"></div>
+                                {% elif color_char == 'U' %}
+                                    <div class="color-box U" title="Azul"></div>
+                                {% elif color_char == 'W' %}
+                                    <div class="color-box W" title="Blanco"></div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <div class="mana I" title="Incoloro"></div>
+                        {% endif %}
+                    </td>
+                    <td><input type="number" name="cantidad_{{ carta['id'] }}" min="1" value="1"></td>
+                    <!-- Campos ocultos para enviar los detalles de la carta -->
+                    <input type="hidden" name="name_{{ carta['id'] }}" value="{{ carta['name'] }}">
+                    <input type="hidden" name="set_name_{{ carta['id'] }}" value="{{ carta['set_name'] }}">
+                    <input type="hidden" name="rarity_{{ carta['id'] }}" value="{{ carta['rarity'] }}">
+                    <input type="hidden" name="colors_{{ carta['id'] }}" value="{{ carta.get('colors', [])|join(',') }}">
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" style="text-align: right;">
+                        <button type="submit">Guardar Seleccionadas</button>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+    {% elif mensaje %}
+        <p>{{ mensaje }}</p>
+    {% endif %}
+</body>
+</html>
